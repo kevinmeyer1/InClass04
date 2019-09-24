@@ -86,7 +86,6 @@ class ProfileActivity : AppCompatActivity() {
 
         btnUpdateProfile.setOnClickListener {
             val intent = Intent(this, UpdateProfileActivity::class.java)
-            println(jwtToken)
             intent.putExtra("jwtToken", jwtToken)
             intent.putExtra("username", username)
             startActivity(intent)

@@ -4,9 +4,13 @@ This project includes the API and Android app needed to complete the requirement
 
 The API was create in Node.js and uses Express for the routing. The data is stored on an Amazon AWS MySQL database.
 
+The API is hosted on Heroku and can be accessed with a web address like: `https://inclass03.herokuapp.com/login`. This address specifically access the login route of the API.
+
 ## Routes
 
 ```/login```:
+
+    https://inclass03.herokuapp.com/login
 
 The login route takes in a username and password in a json object in the request body. The user name and password are verified to see if they exist in the database. If they do exist, the rest of the users information (username, name, age, weight, address) is grabbed from the database and sent back to login route. The route then creates a JWT token using the returned data as the payload. The JWT token is sent back to the app.
 
@@ -24,15 +28,21 @@ The payload of a JWT looks like this:
 
 ```/signup```:
 
+    https://inclass03.herokuapp.com/signup
+
 The signup route takes in a username, password, name, age, weight, and address in a json object in the request body. A query is sent to the database to create a new row with the given information. Username and password are the only required attributes so it is possible to the user to not supply name, age, weight, and address.
 
 Once the user is created, a 'success' response is sent back to the app. The app then sends the user back to the login page with a message saying that the account has been created successfully. The user does not immediately get sent to their profile page once they create an account so there is no need to create or verify a JWT token in this route
 
 ```/profile```:
 
+    https://inclass03.herokuapp.com/profile
+
 The profile route takes in only a JWT token as a json object in the request body. The JWT token is verified in the route. If it passes, 'success' is returned in the response. If it fails, 'failure' is returned and the app will then force the user back to the login page since they are not authenticated. This really shouldn't happen through the app, the only real option for this would be if someone tried to access the API through Postman or something.
 
 ```/update_profile```:
+
+    https://inclass03.herokuapp.com/update_profile
 
 The update_profile route takes in the JWT token, username, name, age, weight, and address as a json object in the request body.
 

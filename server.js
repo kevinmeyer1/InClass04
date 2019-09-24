@@ -4,8 +4,8 @@ var jwt = require('jsonwebtoken');
 var express = require('express');
 var app = express();
 
+//Grabs variables from config.json 
 var config = require('./config.json');
-
 var mySQLUsername = config['mySQLUsername']
 var mySQLPassword = config['mySQLPassword']
 var mySQLHost = config['mySQLHost']
@@ -13,6 +13,7 @@ var mySQLPort = config['mySQLPort']
 var mySQLDatabase = config['mySQLDatabase']
 var jwtSecret = config['jwtSecret']
 
+//Heroku code to set the listening port
 const PORT = process.env.PORT || 3000;
 
 var con = mysql.createConnection({
@@ -23,6 +24,11 @@ var con = mysql.createConnection({
 });
 
 app.use(bodyParser.json());
+
+//the route used when a non existent route is attempted to be connected to
+app.use(function (req, res, next) {
+  res.status(404).send("Sorry can't find that!")
+})
 
 app.post('/login', function(req, res) {
     var username = req.body.username;
@@ -138,6 +144,7 @@ app.post('/update_profile', function(req, res) {
             var updateQuery = `UPDATE users SET name="${name}", age="${age}", weight="${weight}", address="${address}" WHERE
                 username="${username}"`;
 
+            //udpates users information in the databse
             con.query(updateQuery, function(err, result) {
                 if (err) {
                     res.writeHead(400, {'Content-Type':'text/plain'});
@@ -163,6 +170,7 @@ app.post('/update_profile', function(req, res) {
     });
 });
 
+//sets port that API will listen on - Heroku code - different than localhost code
 app.listen(PORT, () => {
     console.log(`Our app is running on port ${ PORT }`);
 });
