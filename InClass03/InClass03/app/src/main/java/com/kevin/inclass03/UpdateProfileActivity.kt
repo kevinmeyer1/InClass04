@@ -45,7 +45,7 @@ class UpdateProfileActivity : AppCompatActivity() {
                 }
                 """.trimIndent()
 
-            val url = "https://inclass03-api-only.herokuapp.com/update_profile"
+            val url = "https://inclass03.herokuapp.com/update_profile"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)

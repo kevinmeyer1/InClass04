@@ -32,7 +32,7 @@ class ProfileActivity : AppCompatActivity() {
                 """.trimIndent()
 
         //validate JWT token with API
-        val url = "https://inclass03-api-only.herokuapp.com/profile"
+        val url = "https://inclass03.herokuapp.com/profile"
         val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
         val request = Request.Builder()
             .url(url)
