@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 """.trimIndent()
 
-            val url = "http:/10.0.2.2:3000/login"
+            val url = "http://10.0.2.2:8080/login"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)
@@ -57,12 +57,9 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onResponse(call: Call?, response: Response?) {
                     val body = response?.body()?.string()
-
                     val jwtToken = body.toString()
 
-                    if (body != "failure") {
-                        toProfilePage(jwtToken, username)
-                    } else {
+                    if (response?.code() == 400) {
                         Handler(Looper.getMainLooper()).post(Runnable {
                             Toast.makeText(
                                 applicationContext,
@@ -70,6 +67,8 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         })
+                    } else if (response?.code() == 200) {
+                        toProfilePage(jwtToken, username)
                     }
                 }
             })

@@ -45,7 +45,7 @@ class UpdateProfileActivity : AppCompatActivity() {
                 }
                 """.trimIndent()
 
-            val url = "http:/10.0.2.2:3000/update_profile"
+            val url = "https://inclass03-api-only.herokuapp.com/update_profile"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)
@@ -60,17 +60,18 @@ class UpdateProfileActivity : AppCompatActivity() {
                 override fun onResponse(call: Call?, response: Response?) {
                     val body = response?.body()?.string()
 
-                    if (body == "jwt-failure") {
+                    if (response?.code() == 401) {
                         //user is not authenticated, force back to login
                         Handler(Looper.getMainLooper()).post(Runnable {
                             Toast.makeText(
                                 applicationContext,
-                                "JWT not validated, force back to Login screen",
+                                "JWT not validated, unauthorized",
                                 Toast.LENGTH_SHORT
                             ).show()
                         })
+
                         toLoginPage()
-                    } else if (body == "failure") {
+                    } else if (response?.code() == 400) {
                         Handler(Looper.getMainLooper()).post(Runnable {
                             Toast.makeText(
                                 applicationContext,
@@ -78,10 +79,9 @@ class UpdateProfileActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         })
-                    } else {
+                    } else if (response?.code() == 200) {
                         //the returned value is the new JWT token with new user info
                         val newJwtToken = body.toString()
-                        println(newJwtToken)
                         toProfilePage(newJwtToken)
                     }
                 }

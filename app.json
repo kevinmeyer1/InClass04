@@ -1,0 +1,11 @@
+{
+    "name": "InClass03-API-Only",
+    "description": "the API needed to run InClass03",
+    "repository": "",
+    "logo": "",
+    "keywords": [
+        "node",
+        "express"
+     ],
+    "image": "heroku/nodejs"
+}

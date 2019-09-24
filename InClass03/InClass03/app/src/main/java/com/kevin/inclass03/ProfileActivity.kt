@@ -32,7 +32,7 @@ class ProfileActivity : AppCompatActivity() {
                 """.trimIndent()
 
         //validate JWT token with API
-        val url = "http:/10.0.2.2:3000/profile"
+        val url = "https://inclass03-api-only.herokuapp.com/profile"
         val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
         val request = Request.Builder()
             .url(url)
@@ -47,28 +47,34 @@ class ProfileActivity : AppCompatActivity() {
             override fun onResponse(call: Call?, response: Response?) {
                 val body = response?.body()?.string()
 
-                if (body == "success") {
+                if (response?.code() == 401) {
+                    //This should never happen
+                    Handler(Looper.getMainLooper()).post(Runnable {
+                        Toast.makeText(
+                            applicationContext,
+                            "JWT not validated, unauthorized",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        toLoginPage()
+                    })
+                } else if (response?.code() == 200) {
                     //Decode JWT payload (stuff.payload.stuff -> splitToken[1]) and make it a JSON Object
                     val splitToken = jwtToken.split(".")
                     val jwtPayload = String(Base64.decode(splitToken[1], Base64.URL_SAFE))
                     val userData = JSONObject(jwtPayload)
 
-                    //Put userData values onto the screen
-                    lblName.text = "Name: " + userData.getString("name")
-                    lblAge.text = "Age: " + userData.getString("age")
-                    lblWeight.text = "Weight: " + userData.getString("weight")
-                    lblAddress.text = "Address: " + userData.getString("address")
+                    val name = userData.getString("name")
+                    val age = userData.getString("age")
+                    val weight = userData.getString("weight")
+                    val address = userData.getString("address")
 
-                } else {
-                    //This should never happen
-                    Handler(Looper.getMainLooper()).post(Runnable {
-                        Toast.makeText(
-                            applicationContext,
-                            "JWT not validated, force back to Login screen.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        toLoginPage()
-                    })
+                    //Put userData values onto the screen
+                    runOnUiThread {
+                        lblName.text = "Name: " + name
+                        lblAge.text = "Age: " + age
+                        lblWeight.text = "Weight: " + weight
+                        lblAddress.text = "Address: " + address
+                    }
                 }
             }
         })

@@ -13,6 +13,8 @@ var mySQLPort = config['mySQLPort']
 var mySQLDatabase = config['mySQLDatabase']
 var jwtSecret = config['jwtSecret']
 
+const PORT = process.env.PORT || 3000;
+
 var con = mysql.createConnection({
     host: mySQLHost,
     user: mySQLUsername,
@@ -31,35 +33,34 @@ app.post('/login', function(req, res) {
     con.query(loginQuery, function (err, result, fields) {
         if (err) {
             console.log(err);
-            res.send('failure');
+            res.writeHead(401, {'Content-Type':'text/plain'});
+            res.wrtie('Unauthorized');
+            res.send();
         } else {
             if (result.length == 1) {
                 //get user information
                 var userInformationQuery = `SELECT username, name, age, weight, address FROM users WHERE username="${username}"`;
                 con.query(userInformationQuery, function(err, result, feilds) {
                     if (err) {
-                        console.log(err);
-                        res.send('failure');
+                        //this should never happen since the login query passed and the user exists
+                        res.writeHead(401, {'Content-Type':'text/plain'});
+                        res.wrtie('Unauthorized');
+                        res.send();
                     } else {
-                        if (result.length == 1) {
-                            //set expiration time
-                            //result[0]['exp'] = '1d';
-                            var data = JSON.stringify(result[0]);
-                            //create JWT token
-                            var token = jwt.sign(data, jwtSecret);
-                            //send token back to the app
-                            res.send(token);
-                        } else {
-                            //This should never happen but error check is needed
-                            res.send('failure');
-                            console.log('got more than one row from username');
-                        }
+                        var data = JSON.stringify(result[0]);
+                        //create JWT token
+                        var token = jwt.sign(data, jwtSecret);
+                        //send token back to the app
+                        res.writeHead(200, {'Content-Type':'text/plain'});
+                        res.write(token);
+                        res.send();
                     }
                 });
             } else {
-                //This should also never happen
-                res.send('failure');
-                console.log('No results found for username/password combination');
+                //This should never happen
+                res.writeHead(401, {'Content-Type':'text/plain'});
+                res.write('Unauthorized');
+                res.send();
             }
         }
     });
@@ -78,14 +79,21 @@ app.post('/signup', function(req, res) {
     con.query(signUpQuery, function(err, result) {
         if (err) {
             if (err['errno'] == '1062') {
+
                 console.log('User tried to create an account with a pre-existing username.');
-                res.send('There is already an account with this username');
+                res.writeHead(1062, {'Content-Type':'text/plain'});
+                res.write('Tried to create an account with a username that already exists');
+                res.send();
             } else {
-                res.send('failure');
+                res.writeHead(400, {'Content-Type':'text/plain'});
+                res.write("There was an error while adding user to database");
+                res.send();
             }
         } else {
             //successful signup sends user back to login page on app so there is no need to create and return a JWT token
-            res.send('success');
+            res.writeHead(201, {'Content-Type':'text/plain'});
+            res.write('User created');
+            res.send();
         }
     });
 });
@@ -97,10 +105,14 @@ app.post('/profile', function(req, res) {
     var jwtVerification = jwt.verify(token, jwtSecret, function(err) {
         if (err) {
             console.log('JWT token not verified, user is not authenticated.');
-            res.send('failure');
+            res.writeHead(401, {'Content-Type':'text/plain'});
+            res.write('JWT verification failed');
+            res.send();
         } else {
             //app already had token, user is verified, nothing to return
-            res.send('success');
+            res.writeHead(200, {'Content-Type':'text/plain'});
+            res.write('JWT verified');
+            res.send();
         }
     });
 });
@@ -118,7 +130,9 @@ app.post('/update_profile', function(req, res) {
     var jwtVerification = jwt.verify(token, jwtSecret, function(err) {
         if (err) {
             console.log('JWT token not verified, user is not authenticated.');
-            res.send('jwt-failure');
+            res.writeHead(401, {'Content-Type':'text/plain'});
+            res.write('JWT verification failed');
+            res.send();
         } else {
             //jwt is verifed, user can make changes
             var updateQuery = `UPDATE users SET name="${name}", age="${age}", weight="${weight}", address="${address}" WHERE
@@ -126,8 +140,9 @@ app.post('/update_profile', function(req, res) {
 
             con.query(updateQuery, function(err, result) {
                 if (err) {
-                    console.log(err);
-                    res.send('failure');
+                    res.writeHead(400, {'Content-Type':'text/plain'});
+                    res.write('Error while updating user information.');
+                    res.send();
                 } else {
                     //create new data payload
                     var newData = {
@@ -139,14 +154,15 @@ app.post('/update_profile', function(req, res) {
                     //create new token with payload
                     var newToken = jwt.sign(JSON.stringify(newData), jwtSecret);
                     //return new token to app
-                    res.send(newToken);
+                    res.writeHead(200, {'Content-Type':'text/plain'});
+                    res.write(newToken);
+                    res.send();
                 }
             });
         }
     });
 });
 
-//I assume that this will change when the code is put on Heroku
-app.listen(3000, function() {
-    console.log('Example app listening on port 3000!');
+app.listen(PORT, () => {
+    console.log(`Our app is running on port ${ PORT }`);
 });

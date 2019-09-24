@@ -66,7 +66,7 @@ class SignUpActivity : AppCompatActivity(){
                 }
                 """.trimIndent()
 
-            val url = "http:/10.0.2.2:3000/signup"
+            val url = "https://inclass03-api-only.herokuapp.com/signup"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)
@@ -81,7 +81,24 @@ class SignUpActivity : AppCompatActivity(){
                 override fun onResponse(call: Call?, response: Response?) {
                     val body = response?.body()?.string()
 
-                    if (body == "success") {
+                    if (response?.code() == 400) {
+                        //this should never happen
+                        Handler(Looper.getMainLooper()).post(Runnable {
+                            Toast.makeText(
+                                applicationContext,
+                                "There was an error while creating the account",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        })
+                    } else if (response?.code() == 1062) {
+                        Handler(Looper.getMainLooper()).post(Runnable {
+                            Toast.makeText(
+                                applicationContext,
+                                "An account with this username already exists",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        })
+                    } else if (response?.code() == 201) {
                         Handler(Looper.getMainLooper()).post(Runnable {
                             Toast.makeText(
                                 applicationContext,
@@ -91,23 +108,6 @@ class SignUpActivity : AppCompatActivity(){
                         })
 
                         backToMain()
-                    } else if (body == "failure") {
-                        //this should never happen
-                        Handler(Looper.getMainLooper()).post(Runnable {
-                            Toast.makeText(
-                                applicationContext,
-                                "There was an error while creating the account",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        })
-                    } else {
-                        Handler(Looper.getMainLooper()).post(Runnable {
-                            Toast.makeText(
-                                applicationContext,
-                                body.toString(),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        })
                     }
                 }
             })
