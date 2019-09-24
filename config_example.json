@@ -1,0 +1,8 @@
+{
+    "mySQLUsername": "username",
+    "mySQLPassword": "password",
+    "mySQLHost": "host address",
+    "mySQLPort": "port number",
+    "mySQLDatabase": "database name",
+    "jwtSecret": "secret key for jwt validation"
+}
