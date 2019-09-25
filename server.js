@@ -146,10 +146,11 @@ app.post('/update_profile', function(req, res) {
                 res.write('Error getting user data');
                 res.send();
               } else {
-                oldName = result[0]['name'];
-                oldAge = result[0]['age'];
-                oldWeight = result[0]['weight'];
-                oldAddress = result[0]['address'];
+                var jsonResult = JSON.parse(result);
+                oldName = jsonResult['name'];
+                oldAge = jsonResult['age'];
+                oldWeight = jsonResult['weight'];
+                oldAddress = jsonResult['address'];
               }
             });
 
@@ -164,6 +165,9 @@ app.post('/update_profile', function(req, res) {
                     res.write('Error while updating user information.');
                     res.send();
                 } else {
+
+
+
                     if (name == "") {
                       name = oldName;
                     }
