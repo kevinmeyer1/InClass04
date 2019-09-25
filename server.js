@@ -164,19 +164,19 @@ app.post('/update_profile', function(req, res) {
                     res.write('Error while updating user information.');
                     res.send();
                 } else {
-                    if name == "" {
+                    if (name == "") {
                       name = oldName;
                     }
-                    
-                    if age == "" {
+
+                    if (age == "") {
                       age = oldAge;
                     }
 
-                    if weight == "" {
+                    if (weight == "") {
                       weight = oldWeight;
                     }
 
-                    if address == "" {
+                    if (address == "") {
                       address = oldAddress
                     }
 
