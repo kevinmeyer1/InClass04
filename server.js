@@ -205,6 +205,3 @@ app.listen(PORT, () => {
 });
 
 //espressjs.com said to add this at the bottom
-app.use(function (req, res, next) {
-  res.status(404).send("Sorry can't find that!")
-})
