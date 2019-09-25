@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        
+
         val client = OkHttpClient()
 
         btnLogIn.setOnClickListener {
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                     val body = response?.body()?.string()
                     val jwtToken = body.toString()
 
-                    if (response?.code() == 400) {
+                    if (response?.code() == 401) {
                         Handler(Looper.getMainLooper()).post(Runnable {
                             Toast.makeText(
                                 applicationContext,
