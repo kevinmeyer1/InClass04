@@ -4,7 +4,7 @@ var jwt = require('jsonwebtoken');
 var express = require('express');
 var app = express();
 
-//Grabs variables from config.json 
+//Grabs variables from config.json
 var config = require('./config.json');
 var mySQLUsername = config['mySQLUsername']
 var mySQLPassword = config['mySQLPassword']
@@ -26,9 +26,7 @@ var con = mysql.createConnection({
 app.use(bodyParser.json());
 
 //the route used when a non existent route is attempted to be connected to
-app.use(function (req, res, next) {
-  res.status(404).send("Sorry can't find that!")
-})
+
 
 app.post('/login', function(req, res) {
     var username = req.body.username;
