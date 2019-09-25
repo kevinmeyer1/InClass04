@@ -127,6 +127,8 @@ app.post('/update_profile', function(req, res) {
     var weight = req.body.weight;
     var address = req.body.address;
 
+    var oldName, oldAge, oldWeight, oldAddress;
+
     //Verify that the user is authenticated and should be able to change user data
     var jwtVerification = jwt.verify(token, jwtSecret, function(err) {
         if (err) {
@@ -135,6 +137,22 @@ app.post('/update_profile', function(req, res) {
             res.write('JWT verification failed');
             res.send();
         } else {
+            //get uer information first
+            var profileQuery = `SELECT name, age, weight, address FROM users WHERE username="${username}"`;
+
+            con.query(profileQuery, function(err, result) {
+              if (err) {
+                res.writeHead(400, {'Content-Type': 'text/plain'});
+                res.write('Error getting user data');
+                res.send();
+              } else {
+                oldName = result[0];
+                oldAge = result[1];
+                oldWeight = result[2];
+                oldAddress = result[3];
+              }
+            });
+
             //jwt is verifed, user can make changes
             var updateQuery = `UPDATE users SET name="${name}", age="${age}", weight="${weight}", address="${address}" WHERE
                 username="${username}"`;
@@ -146,6 +164,22 @@ app.post('/update_profile', function(req, res) {
                     res.write('Error while updating user information.');
                     res.send();
                 } else {
+                    if name == "" {
+                      name = oldName;
+                    }
+                    
+                    if age == "" {
+                      age = oldAge;
+                    }
+
+                    if weight == "" {
+                      weight = oldWeight;
+                    }
+
+                    if address == "" {
+                      address = oldAddress
+                    }
+
                     //create new data payload
                     var newData = {
                         'name': name,
