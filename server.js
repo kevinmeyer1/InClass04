@@ -146,10 +146,10 @@ app.post('/update_profile', function(req, res) {
                 res.write('Error getting user data');
                 res.send();
               } else {
-                oldName = result[0];
-                oldAge = result[1];
-                oldWeight = result[2];
-                oldAddress = result[3];
+                oldName = result[0]['name'];
+                oldAge = result[0]['age'];
+                oldWeight = result[0]['weight'];
+                oldAddress = result[0]['address'];
               }
             });
 
