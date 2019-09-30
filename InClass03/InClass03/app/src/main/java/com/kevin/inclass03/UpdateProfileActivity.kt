@@ -1,10 +1,12 @@
 package com.kevin.inclass03
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.preference.PreferenceManager
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_update_profile.*
 import okhttp3.*
@@ -16,14 +18,22 @@ class UpdateProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_update_profile)
 
-        val jwtToken = intent.getStringExtra("jwtToken")
-        val username = intent.getStringExtra("username")
+        val profileName = intent.getStringExtra("name")
+        val profileAge = intent.getStringExtra("age")
+        val profileWeight = intent.getStringExtra("weight")
+        val profileAddress = intent.getStringExtra("address")
+
+        //set the text of the editTexts to the data already set for the user.
+        txtName.setText(profileName)
+        txtAge.setText(profileAge)
+        txtWeight.setText(profileWeight)
+        txtAddress.setText(profileAddress)
 
         val client = OkHttpClient()
+        val jwtToken = getJwt()
 
         btnCancel.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
-            intent.putExtra("jwtToken", jwtToken);
             startActivity(intent)
         }
 
@@ -36,7 +46,6 @@ class UpdateProfileActivity : AppCompatActivity() {
             val reqJson =
                 """
                 {
-                    "username": "$username",
                     "token": "$jwtToken",
                     "name": "$name",
                     "age": "$age",
@@ -45,7 +54,7 @@ class UpdateProfileActivity : AppCompatActivity() {
                 }
                 """.trimIndent()
 
-            val url = "https://inclass03.herokuapp.com/update_profile"
+            val url = "http://10.0.2.2:3000/update_profile"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)
@@ -80,9 +89,8 @@ class UpdateProfileActivity : AppCompatActivity() {
                             ).show()
                         })
                     } else if (response?.code() == 200) {
-                        //the returned value is the new JWT token with new user info
-                        val newJwtToken = body.toString()
-                        toProfilePage(newJwtToken)
+                        //user data has been updated. the user will see changes when they are returned to profile
+                        toProfilePage()
                     }
                 }
             })
@@ -94,9 +102,14 @@ class UpdateProfileActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun toProfilePage(newJwtToken: String) {
+    fun toProfilePage() {
         val intent = Intent(this, ProfileActivity::class.java)
-        intent.putExtra("jwtToken", newJwtToken);
         startActivity(intent)
+    }
+
+    fun getJwt(): String {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+
+        return prefs.getString("jwtToken", null).toString()
     }
 }

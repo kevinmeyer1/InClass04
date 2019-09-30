@@ -1,14 +1,17 @@
 package com.kevin.inclass03
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
+import org.json.JSONObject
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +21,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val client = OkHttpClient()
+
+        //Check if the user has already signed in (jwt is stored on device)
+        checkForJwtOnDevice()
 
         btnLogIn.setOnClickListener {
             val username = txtUsername.text.toString()
@@ -42,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 """.trimIndent()
 
-            val url = "https://inclass03.herokuapp.com/login"
+            val url = "http://10.0.2.2:3000/login"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)
@@ -56,7 +62,6 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onResponse(call: Call?, response: Response?) {
                     val body = response?.body()?.string()
-                    val jwtToken = body.toString()
 
                     if (response?.code() == 401) {
                         Handler(Looper.getMainLooper()).post(Runnable {
@@ -67,7 +72,10 @@ class MainActivity : AppCompatActivity() {
                             ).show()
                         })
                     } else if (response?.code() == 200) {
-                        toProfilePage(jwtToken, username)
+                        val tokenJson = JSONObject(body.toString())
+                        println(tokenJson["token"].toString())
+                        saveJwtToDevice(tokenJson["token"].toString())
+                        toProfilePage()
                     }
                 }
             })
@@ -79,10 +87,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun toProfilePage(jwtToken: String, username: String) {
+    //sends user to profile page
+    fun toProfilePage() {
         val intent = Intent(this, ProfileActivity::class.java)
-        intent.putExtra("jwtToken", jwtToken)
-        intent.putExtra("username", username)
         startActivity(intent)
+    }
+
+    //saves the JWT to the device
+    fun saveJwtToDevice(jwtToken: String) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val editor = prefs.edit()
+        editor.putString("jwtToken", jwtToken)
+        editor.commit()
+    }
+
+    //checks for a JWT saved on the device
+    fun checkForJwtOnDevice() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+
+        if (prefs.getString("jwtToken", null) != null) {
+            toProfilePage()
+        }
     }
 }

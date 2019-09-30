@@ -4,5 +4,8 @@
     "mySQLHost": "inclass03.cn2talrxqqs7.us-east-2.rds.amazonaws.com",
     "mySQLPort": "3306",
     "mySQLDatabase": "InClass03",
-    "jwtSecret": "secret"
+    "jwtSecret": "secret",
+    "merchantId": "t6xvdf253xv8gfst",
+    "publicKey": "n7g4y36bm24vqxzf",
+    "privateKey": "a56769faf9fd806e0a8f4960496ba45b"
 }

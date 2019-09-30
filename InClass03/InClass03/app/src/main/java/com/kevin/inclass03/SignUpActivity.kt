@@ -66,7 +66,7 @@ class SignUpActivity : AppCompatActivity(){
                 }
                 """.trimIndent()
 
-            val url = "https://inclass03.herokuapp.com/signup"
+            val url = "http://10.0.2.2:3000/signup"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)
