@@ -1,0 +1,111 @@
+{
+	"variables": [],
+	"info": {
+		"name": "InClass04",
+		"_postman_id": "4bc4d94a-1633-f55f-355c-5f8b70f7e5e7",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "https://inclass03.herokuapp.com/login",
+			"request": {
+				"url": "https://inclass03.herokuapp.com/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"kevin\",\n\t\"password\": \"password\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "https://inclass03.herokuapp.com/profile",
+			"request": {
+				"url": "https://inclass03.herokuapp.com/profile",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImtldmluIn0.0S5hnJzMX_ABc5RtkCK0QgWkbHca14m_nCVV7FmUqc4\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "https://inclass03.herokuapp.com/signup",
+			"request": {
+				"url": "https://inclass03.herokuapp.com/signup",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"asdf\",\n\t\"password\": \"password\",\n\t\"name\": \"asdf\",\n\t\"age\": \"15\",\n\t\"weight\": \"100\",\n\t\"address\": \"asdf\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "https://inclass03.herokuapp.com/update_profile",
+			"request": {
+				"url": "https://inclass03.herokuapp.com/update_profile",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImtldmluIn0.0S5hnJzMX_ABc5RtkCK0QgWkbHca14m_nCVV7FmUqc4\",\n\t\"name\": \"newname\",\n\t\"age\": \"35\",\n\t\"weight\": \"300\",\n\t\"address\": \"newaddress\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "https://inclass03.herokuapp.com/customer",
+			"request": {
+				"url": "https://inclass03.herokuapp.com/customer",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImtldmluIn0.0S5hnJzMX_ABc5RtkCK0QgWkbHca14m_nCVV7FmUqc4\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
