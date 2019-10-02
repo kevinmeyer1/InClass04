@@ -262,6 +262,8 @@ app.post('/update_profile', function(req, res) {
     var weight = req.body.weight
     var address = req.body.address
 
+    var oldName, oldAge, oldWeight, oldAddress;
+
     //Verify that the user is authenticated and should be able to change user data
     jwt.verify(token, jwtSecret, function(err, decodedPayload) {
         if (err) {
