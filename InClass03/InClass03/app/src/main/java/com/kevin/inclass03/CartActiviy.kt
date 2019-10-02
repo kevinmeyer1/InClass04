@@ -52,7 +52,8 @@ class CartActiviy : AppCompatActivity() {
                 }
                 """.trimIndent()
 
-            val url = "http://10.0.2.2:3000/customer"
+            //val url = "http://10.0.2.2:3000/customer"
+            val url = "https://inclass03.herokuapp.com/customer"
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
             val request = Request.Builder()
                 .url(url)
@@ -109,7 +110,8 @@ class CartActiviy : AppCompatActivity() {
                     """.trimIndent()
 
                 val client = OkHttpClient()
-                val url = "http://10.0.2.2:3000/transaction"
+                //val url = "http://10.0.2.2:3000/transaction"
+                val url = "https://inclass03.herokuapp.com/transaction"
                 val body =
                     RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
                 val request = Request.Builder()
