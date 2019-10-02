@@ -1,5 +1,6 @@
 package com.kevin.inclass03
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_shopping.*
@@ -10,6 +11,7 @@ import java.io.InputStream
 class ShoppingActivity : AppCompatActivity() {
 
     val itemList = ArrayList<Item>()
+    val cart = ArrayList<Item>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,15 +33,19 @@ class ShoppingActivity : AppCompatActivity() {
             itemList.add(item)
         }
 
-        //println(itemList.size)
-
-        val adapter = ItemCellAdapter(this, R.layout.itemcell, itemList)
-
+        val adapter = ItemCellAdapter(this, R.layout.itemcell, itemList, this)
         listView.adapter = adapter
+
+
+        btnCart.setOnClickListener {
+            val intent = Intent(this, CartActiviy::class.java)
+            intent.putParcelableArrayListExtra("cart", cart)
+            startActivity(intent)
+        }
     }
 
     fun readJSONFromAsset(): String? {
-        var json: String? = null
+        var json: String?
         try {
             val  inputStream: InputStream = assets.open("discount.json")
             json = inputStream.bufferedReader().use{it.readText()}
@@ -48,5 +54,9 @@ class ShoppingActivity : AppCompatActivity() {
             return null
         }
         return json
+    }
+
+    fun addToCart(item: Item) {
+        this.cart.add(item)
     }
 }

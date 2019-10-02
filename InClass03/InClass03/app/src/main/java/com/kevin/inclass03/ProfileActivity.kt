@@ -12,7 +12,6 @@ import okhttp3.*
 import java.io.IOException
 import kotlinx.android.synthetic.main.activity_profile.*
 import org.json.JSONObject
-import com.braintreepayments.api.dropin.DropInRequest
 import com.braintreepayments.api.dropin.DropInActivity
 import com.braintreepayments.api.dropin.DropInResult
 
@@ -115,49 +114,8 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        btnGetToken.setOnClickListener {
+        btnShopping.setOnClickListener {
             toShoppingPage()
-            /*
-            val url = "http://10.0.2.2:3000/customer"
-            val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
-            val request = Request.Builder()
-                .url(url)
-                .post(body)
-                .build()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call?, e: IOException?) {
-                    println("${e?.message}")
-                }
-
-                override fun onResponse(call: Call?, response: Response?) {
-                    val body = response?.body()?.string()
-
-                    if (response?.code() == 200) {
-                        val clientToken = JSONObject(body.toString())["clientToken"].toString()
-
-                        val dropInRequest = DropInRequest()
-                            .clientToken(clientToken)
-                        startActivityForResult(dropInRequest.getIntent(applicationContext), 1)
-
-
-                    } else if (response?.code() == 401) {
-                        //This should never happen
-                        Handler(Looper.getMainLooper()).post(Runnable {
-                            Toast.makeText(
-                                applicationContext,
-                                "JWT not validated, unauthorized",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                            toLoginPage()
-                        })
-                    }
-
-
-                }
-            })
-            */
         }
     }
 
@@ -184,69 +142,4 @@ class ProfileActivity : AppCompatActivity() {
         val intent = Intent(this, ShoppingActivity::class.java)
         startActivity(intent)
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 1) {
-            println("in on activity result")
-            if (resultCode == Activity.RESULT_OK) {
-                val result =
-                    data!!.getParcelableExtra<DropInResult>(DropInResult.EXTRA_DROP_IN_RESULT)
-                // use the result to update your UI and send the payment method nonce to your server
-
-
-                println(result.paymentMethodNonce)
-                println(result.paymentMethodType)
-                println(result.paymentMethodNonce?.nonce)
-                println(result.paymentMethodNonce?.nonce.toString())
-
-
-                val reqJson =
-                    """
-                    {
-                        "paymentMethodNonce": "${result.paymentMethodNonce?.nonce}"
-                    }
-                    """.trimIndent()
-
-                val client = OkHttpClient()
-                val url = "http://10.0.2.2:3000/transaction"
-                val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
-                val request = Request.Builder()
-                    .url(url)
-                    .post(body)
-                    .build()
-
-                client.newCall(request).enqueue(object : Callback {
-                    override fun onFailure(call: Call?, e: IOException?) {
-                        println("${e?.message}")
-                    }
-
-                    override fun onResponse(call: Call?, response: Response?) {
-                        val body = response?.body()?.string()
-
-                        println(body.toString())
-                    }
-                })
-
-
-
-
-
-
-
-
-
-
-
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // the user canceled
-                println("canceled")
-            } else {
-                // handle errors here, an exception may be available in
-                val error = data!!.getSerializableExtra(DropInActivity.EXTRA_ERROR) as Exception
-                println(error)
-            }
-        }
-    }
-
-
 }

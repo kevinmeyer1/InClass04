@@ -35,11 +35,6 @@
             android:layout_height="wrap_content"
             android:text="Region" />
 
-        <Button
-            android:id="@+id/btnAddToCart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add to Cart" />
     </LinearLayout>
 
 </LinearLayout>

@@ -17,14 +17,14 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-public class ItemCellAdapter extends ArrayAdapter<Item> {
+public class CartCellAdapter extends ArrayAdapter<Item> {
 
     Context context;
     int resource;
     ArrayList<Item> itemList;
-    ShoppingActivity activity;
+    CartActiviy activity;
 
-    public ItemCellAdapter(Context context, int resource, ArrayList<Item> itemList, ShoppingActivity activity) {
+    public CartCellAdapter(Context context, int resource, ArrayList<Item> itemList, CartActiviy activity) {
         super(context, resource, itemList);
 
         this.context = context;
@@ -38,7 +38,7 @@ public class ItemCellAdapter extends ArrayAdapter<Item> {
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View view = inflater.inflate(R.layout.itemcell, parent, false);
+        View view = inflater.inflate(R.layout.cartcell, parent, false);
 
         TextView name = view.findViewById(R.id.lblName);
         TextView price = view.findViewById(R.id.lblPrice);
@@ -48,7 +48,7 @@ public class ItemCellAdapter extends ArrayAdapter<Item> {
         Item item = itemList.get(position);
 
         name.setText(item.getName());
-        price.setText("$" + Double.toString(item.getPrice()));
+        price.setText(Double.toString(item.getPrice()));
         region.setText(item.getRegion());
 
         if (item.getPhoto() != "null") {
@@ -61,19 +61,6 @@ public class ItemCellAdapter extends ArrayAdapter<Item> {
             int imgResource = context.getResources().getIdentifier("not_found", "drawable", context.getPackageName());
             itemImage.setImageResource(imgResource);
         }
-
-
-        view.findViewById(R.id.btnAddToCart).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Item currentItem = itemList.get(position);
-                String toastText = currentItem.getName() + " added to cart";
-
-                Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
-
-                activity.addToCart(currentItem);
-            }
-        });
 
         return view;
     }

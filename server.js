@@ -19,7 +19,7 @@ var publicKey = config['publicKey']
 var privateKey = config['privateKey']
 
 //Heroku code to set the listening port
-//const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000
 
 // ------------------------------------------------- CONNECTIONS  -------------------------------------------------
 
@@ -115,8 +115,7 @@ app.post('/customer', function(req, res) {
 //Add a credit card for a current user
 app.post('/transaction', function(req, res) {
     var nonceFromTheClient = req.body.paymentMethodNonce
-    //var paymentAmount = req.body.paymentMethodAmount
-    var paymentAmount = "15.00"
+    var paymentAmount = req.body.paymentMethodAmount
 
     gateway.transaction.sale({
         amount: paymentAmount,
@@ -126,15 +125,18 @@ app.post('/transaction', function(req, res) {
         }
     }, function(err, result) {
         if (result.success) {
-            console.log('sale success')
+            res.status(200)
+            res.setHeader('Content-Type', 'text/plain')
+            res.write('Transaction was successful - check Braintree Sandbox')
+            res.send()
         } else {
-            console.log('sale failure')
-            console.log(err)
+            console.log("Err: " + err)
+            res.status(400)
+            res.setHeader('Content-Type', 'text/plain')
+            res.write('There was an error while creating the transaction')
+            res.send()
         }
     });
-
-    res.write('doing stuff - check the server')
-    res.send()
 })
 
 app.post('/login', function(req, res) {
@@ -194,7 +196,7 @@ app.post('/signup', function(req, res) {
         if (err) {
             if (err['errno'] == '1062') {
                 //1062 is an SQL error code, not a response status but its easy to pass this way
-                res.status(1062)
+                res.status(500)
                 res.setHeader('Content-Type', 'text/plain')
                 res.write('Tried to create an account with a username that already exists')
                 res.send()
@@ -293,7 +295,12 @@ app.post('/update_profile', function(req, res) {
     })
 })
 
-//sets port that API will listen on - Heroku code - different than localhost code
+/*
 app.listen(3000, function() {
     console.log('Example app listening on port 3000!')
+})
+*/
+//sets port that API will listen on - Heroku code - different than localhost code
+app.listen(PORT, () => {
+    console.log(`Our app is running on port ${ PORT }`);
 })

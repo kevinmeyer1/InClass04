@@ -1,6 +1,9 @@
 package com.kevin.inclass03;
 
-public class Item {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Item implements Parcelable{
 
     private int discount;
     private String name;
@@ -15,6 +18,40 @@ public class Item {
         this.price = price;
         this.region = region;
     }
+
+    protected Item(Parcel in) {
+        discount = in.readInt();
+        name = in.readString();
+        photo = in.readString();
+        price = in.readDouble();
+        region = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(discount);
+        dest.writeString(name);
+        dest.writeString(photo);
+        dest.writeDouble(price);
+        dest.writeString(region);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Item> CREATOR = new Creator<Item>() {
+        @Override
+        public Item createFromParcel(Parcel in) {
+            return new Item(in);
+        }
+
+        @Override
+        public Item[] newArray(int size) {
+            return new Item[size];
+        }
+    };
 
     public int getDiscount() {
         return discount;
@@ -55,6 +92,4 @@ public class Item {
     public void setRegion(String region) {
         this.region = region;
     }
-
-
 }

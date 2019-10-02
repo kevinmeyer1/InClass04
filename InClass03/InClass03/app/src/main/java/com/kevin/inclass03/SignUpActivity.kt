@@ -90,7 +90,7 @@ class SignUpActivity : AppCompatActivity(){
                                 Toast.LENGTH_SHORT
                             ).show()
                         })
-                    } else if (response?.code() == 1062) {
+                    } else if (response?.code() == 500) {
                         Handler(Looper.getMainLooper()).post(Runnable {
                             Toast.makeText(
                                 applicationContext,

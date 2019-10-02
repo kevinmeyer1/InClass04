@@ -3,18 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ShoppingActivity">
+    tools:context=".CartActiviy">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <Button
-            android:id="@+id/btnCart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="View Cart" />
 
         <ListView
             android:id="@+id/listView"
@@ -22,7 +16,24 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:visibility="visible">
+
         </ListView>
+
+        <TextView
+            android:id="@+id/lblAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Amount" />
+
+        <Button
+            android:id="@+id/btnCheckout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginBottom="20dp"
+            android:text="Checkout" />
 
     </LinearLayout>
 
