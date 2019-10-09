@@ -25,8 +25,6 @@ class CardActivity : AppCompatActivity() {
         val chargeAmountString = intent.getStringExtra("chargeAmount")
         val chargeAmount = chargeAmountString.toDouble()
 
-        println("card activity: " + chargeAmount)
-
         btnAddCard.setOnClickListener {
             var custCard : Card?
             custCard = card_widget.card

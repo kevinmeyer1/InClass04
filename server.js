@@ -89,6 +89,9 @@ var findCustomer = function(username, callback) {
 
 app.use(bodyParser.json())
 
+
+/*
+//Get the customer Id
 app.post('/customer', function(req, res) {
     var token = req.body.token
 
@@ -101,9 +104,8 @@ app.post('/customer', function(req, res) {
             res.send()
         } else {
             var username = decodedPayload['username']
-            var customerQuery = `SELECT id FROM customers WHERE username="${username}"`
-            con.query(customerQuery, function(err, result) {
-                if (err) {
+            findCustomer(username, function(result) {
+                if (result === null) {
                     console.log(err)
                     res.status(400)
                     res.write('Error while getting customer ID from database')
@@ -123,6 +125,7 @@ app.post('/customer', function(req, res) {
         }
     })
 })
+*/
 
 app.post('/addCard', function(req, res) {
     var token = req.body.token
