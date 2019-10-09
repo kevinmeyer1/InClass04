@@ -10,13 +10,15 @@ public class Item implements Parcelable{
     private String photo;
     private double price;
     private String region;
+    private Integer amount;
 
-    public Item(int discount, String name, String photo, double price, String region) {
+    public Item(int discount, String name, String photo, double price, String region, Integer amount) {
         this.discount = discount;
         this.name = name;
         this.photo = photo;
         this.price = price;
         this.region = region;
+        this.amount = amount;
     }
 
     protected Item(Parcel in) {
@@ -25,6 +27,7 @@ public class Item implements Parcelable{
         photo = in.readString();
         price = in.readDouble();
         region = in.readString();
+        amount = in.readInt();
     }
 
     @Override
@@ -34,6 +37,7 @@ public class Item implements Parcelable{
         dest.writeString(photo);
         dest.writeDouble(price);
         dest.writeString(region);
+        dest.writeInt(amount);
     }
 
     @Override
@@ -73,6 +77,8 @@ public class Item implements Parcelable{
         return region;
     }
 
+    public Integer getAmount() { return amount; }
+
     public void setDiscount(int discount) {
         this.discount = discount;
     }
@@ -92,4 +98,6 @@ public class Item implements Parcelable{
     public void setRegion(String region) {
         this.region = region;
     }
+
+    public void setAmount(Integer amount) { this.amount = amount; }
 }

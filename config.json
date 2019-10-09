@@ -5,7 +5,6 @@
     "mySQLPort": "3306",
     "mySQLDatabase": "InClass03",
     "jwtSecret": "secret",
-    "merchantId": "t6xvdf253xv8gfst",
-    "publicKey": "n7g4y36bm24vqxzf",
-    "privateKey": "a56769faf9fd806e0a8f4960496ba45b"
+    "publishableKey": "pk_test_ylqAzIaIWW0phnBiyBf2izTP00fLjAHCEw",
+    "secretKey": "sk_test_KHiiRsYwlbDTW8aiMJf1qt3Z00oY60s4iZ"
 }

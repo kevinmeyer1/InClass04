@@ -14,21 +14,12 @@ var mySQLHost = config['mySQLHost']
 var mySQLPort = config['mySQLPort']
 var mySQLDatabase = config['mySQLDatabase']
 var jwtSecret = config['jwtSecret']
-var merchantId = config['merchantId']
-var publicKey = config['publicKey']
-var privateKey = config['privateKey']
+const stripe = require("stripe")(config['secretKey']);
 
 //Heroku code to set the listening port
 const PORT = process.env.PORT || 3000
 
 // ------------------------------------------------- CONNECTIONS  -------------------------------------------------
-
-var gateway = braintree.connect({
-    environment: braintree.Environment.Sandbox,
-    merchantId: merchantId,
-    publicKey: publicKey,
-    privateKey: privateKey
-})
 
 var con = mysql.createConnection({
     host: mySQLHost,
@@ -39,43 +30,57 @@ var con = mysql.createConnection({
 
 // ------------------------------------------------- FUNCTIONS -------------------------------------------------
 
-var generateClientToken = function(res, username) {
-    gateway.clientToken.generate({
-        customerId: username
-    }, function(err, response) {
-        if (err) {
-            console.log('error while getting client token after customer creation')
-            console.log(err)
-            res.status(400)
-            res.setHeader('Content-Type', 'text/plain')
-            res.write("There was an error while getting clientToken")
-            res.send()
-        } else {
-            var clientTokenJson = {
-                'clientToken': response.clientToken
-            }
+var createCustomer = function(username, callback) {
+    console.log('creating customer')
 
-            res.status(200)
-            res.setHeader('Content-Type', 'application/json')
-            res.json(clientTokenJson)
+    stripe.customers.create({
+        name: `${username}`
+    }, function(err, customer) {
+        if (err) {
+            console.log('err creating customer in stripe')
+            console.log(err)
+            callback(null)
+        } else {
+            var createCustomerQuery = `INSERT INTO customers (username, id) VALUES ("${username}", "${customer['id']}")`
+
+            con.query(createCustomerQuery, function(err, result) {
+                if (err) {
+                    callback(false)
+                } else {
+                    callback(true)
+                }
+            })
+        }
+    });
+}
+
+var foundCustomer = function(username, callback) {
+    var customerQuery = `SELECT username, id FROM customers WHERE username="${username}"`
+
+    con.query(customerQuery, function(err, result) {
+        if (err) {
+            console.log(err)
+            callback(null)
+        } else {
+            if (result.length == 1) {
+                callback(true)
+            }  else {
+                callback(false)
+            }
         }
     })
 }
 
-var createCustomer = function(res, username) {
-    gateway.customer.create({
-        id: username,
-    }, function(err, result) {
+var findCustomer = function(username, callback) {
+    var customerQuery = `SELECT id FROM customers WHERE username="${username}"`
+    con.query(customerQuery, function(err, result) {
         if (err) {
-            console.log('error while creating customer')
-            console.log(err)
-            res.status(400)
-            res.setHeader('Content-Type', 'text/plain')
-            res.write("There was an error while creating customer")
-            res.send()
+            console.log('there was an error finding the customer id')
+            callback(null)
         } else {
-            //user has been created so get the client token
-            generateClientToken(res, username)
+            if (result.length == 1) {
+                callback(result[0]['id'])
+            }
         }
     })
 }
@@ -84,7 +89,6 @@ var createCustomer = function(res, username) {
 
 app.use(bodyParser.json())
 
-//Find and get customer token or create new customer and get token
 app.post('/customer', function(req, res) {
     var token = req.body.token
 
@@ -97,46 +101,112 @@ app.post('/customer', function(req, res) {
             res.send()
         } else {
             var username = decodedPayload['username']
-
-            //Try to find the Customer attached to the username of the app user
-            gateway.customer.find(username, function(err, customer) {
+            var customerQuery = `SELECT id FROM customers WHERE username="${username}"`
+            con.query(customerQuery, function(err, result) {
                 if (err) {
-                    //user was not found so create a customer with the user id
-                    createCustomer(res, username)
+                    console.log(err)
+                    res.status(400)
+                    res.write('Error while getting customer ID from database')
+                    res.send()
                 } else {
-                    //user has been found so get the client token
-                    generateClientToken(res, username)
+                    if (result.length == 1) {
+                        var customerData = {
+                            id: result[0]['id']
+                        }
+
+                        res.status(200)
+                        res.setHeader('Content-Type', 'application/json')
+                        res.json(customerData)
+                    }
                 }
             })
         }
     })
 })
 
-//Add a credit card for a current user
-app.post('/transaction', function(req, res) {
-    var nonceFromTheClient = req.body.paymentMethodNonce
-    var paymentAmount = req.body.paymentMethodAmount
+app.post('/addCard', function(req, res) {
+    var token = req.body.token
+    var cardToken = req.body.cardToken
 
-    gateway.transaction.sale({
-        amount: paymentAmount,
-        paymentMethodNonce: nonceFromTheClient,
-        options: {
-            submitForSettlement: true
-        }
-    }, function(err, result) {
-        if (result.success) {
-            res.status(200)
+    jwt.verify(token, jwtSecret, function(err, decodedPayload) {
+        if (err) {
+            console.log('JWT token not verified, user is not authenticated.')
+            res.status(401)
             res.setHeader('Content-Type', 'text/plain')
-            res.write('Transaction was successful - check Braintree Sandbox')
+            res.write('JWT verification failed')
             res.send()
         } else {
-            console.log("Err: " + err)
-            res.status(400)
-            res.setHeader('Content-Type', 'text/plain')
-            res.write('There was an error while creating the transaction')
-            res.send()
+            var username = decodedPayload['username']
+            findCustomer(username, function(customerId) {
+
+                stripe.customers.createSource(
+                    customerId,
+                    {
+                        source: cardToken
+                    },
+                    function (err, card) {
+                        if (err) {
+                            console.log(err)
+                            res.status(400)
+                            res.write('Error while adding card')
+                            res.send()
+                        } else {
+                            var cardJson = {
+                                'cardToken': card['id']
+                            }
+
+                            res.status(200)
+                            res.setHeader('Content-Type', 'application/json')
+                            res.json(cardJson)
+                        }
+                    }
+                )
+            })
         }
-    });
+    })
+})
+
+//Add a credit card for a current user
+app.post('/charge', function(req, res) {
+    var token = req.body.token
+    var chargeAmount = req.body.chargeAmount
+
+    //Charge amount comes in as a value like 7.89 - needs to be 7890
+    chargeAmount = chargeAmount * 100
+
+    jwt.verify(token, jwtSecret, function(err, decodedPayload) {
+        if (err) {
+            console.log('JWT token not verified, user is not authenticated.')
+            res.status(401)
+            res.setHeader('Content-Type', 'text/plain')
+            res.write('JWT verification failed')
+            res.send()
+        } else {
+            var username = decodedPayload['username']
+            findCustomer(username, function(customerId) {
+                console.log(customerId)
+
+                stripe.charges.create({
+                    amount: chargeAmount,
+                    currency: 'usd',
+                    description: 'Purchase from InClass04 shopping application',
+                    customer: customerId
+                }, function (err, something) {
+                    if (err) {
+                        console.log(err)
+                        res.status(400)
+                        res.write('Error while creating charge')
+                        res.send()
+                    } else {
+                        res.status(200)
+                        res.setHeader('Content-Type', 'text/plain')
+                        res.write('Charge has been successfully create - check stripe')
+                        res.send()
+                    }
+                })
+            })
+        }
+    })
 })
 
 app.post('/login', function(req, res) {
@@ -207,10 +277,30 @@ app.post('/signup', function(req, res) {
                 res.send()
             }
         } else {
-            res.status(201)
-            res.setHeader('Content-Type', 'text/plain')
-            res.write('User created')
-            res.send()
+            foundCustomer(username, function (foundCustomerResult) {
+                if (foundCustomerResult) {
+                    console.log('customer found')
+                    res.status(201)
+                    res.setHeader('Content-Type', 'text/plain')
+                    res.write('Customer found in Stripe')
+                    res.send()
+                } else {
+                    console.log('customer not found')
+                    createCustomer(username, function(createCustomerResult) {
+                        if (createCustomerResult) {
+                            res.status(201)
+                            res.setHeader('Content-Type', 'text/plain')
+                            res.write('User created')
+                            res.send()
+                        } else {
+                            res.status(400)
+                            res.setHeader('Content-Type', 'text/plain')
+                            res.write("Error while creating customer - stripe")
+                            res.send()
+                        }
+                    })
+                }
+            })
         }
     })
 })
@@ -302,7 +392,40 @@ app.listen(3000, function() {
     console.log('Example app listening on port 3000!')
 })
 */
+
 //sets port that API will listen on - Heroku code - different than localhost code
 app.listen(PORT, () => {
     console.log(`Our app is running on port ${ PORT }`);
 })
+
+
+
+
+/*
+app.post('/paymentIntent', function(req, res) {
+    console.log('hello')
+    var amount = req.body.amount
+
+    console.log(amount)
+
+    stripe.paymentIntents.create({
+        amount: 1099,
+        currency: 'usd',
+    }, function(err, intent) {
+        if (err) {
+            console.log(err)
+            res.status(400)
+            res.send()
+        } else {
+            var data = {
+                client_secret: intent['client_secret']
+            }
+
+            console.log('sending data back')
+            res.status(200)
+            res.setHeader('Content-Type', 'application/json')
+            res.json(data)
+        }
+    })
+})
+*/

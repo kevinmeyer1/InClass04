@@ -34,4 +34,5 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.braintreepayments.api:drop-in:3.7.1'
+    implementation 'com.stripe:stripe-android:11.2.0'
 }

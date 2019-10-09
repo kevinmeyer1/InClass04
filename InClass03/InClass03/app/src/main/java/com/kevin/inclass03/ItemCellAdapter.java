@@ -71,7 +71,21 @@ public class ItemCellAdapter extends ArrayAdapter<Item> {
 
                 Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
 
-                activity.addToCart(currentItem);
+                if (activity.getCart().indexOf(currentItem) == -1) {
+                    System.out.println("did not find the item in the cart");
+                    activity.addToCart(currentItem);
+                } else {
+                    System.out.println("item found in cart");
+
+                    Integer itemPositionInCart = activity.getCart().indexOf(currentItem);
+                    Item itemInCart = activity.getCart().get(itemPositionInCart);
+
+                    Integer currentAmount = itemInCart.getAmount();
+                    activity.removeItemFromCart(itemInCart);
+
+                    currentItem.setAmount(currentAmount + 1);
+                    activity.addToCart(currentItem);
+                }
             }
         });
 

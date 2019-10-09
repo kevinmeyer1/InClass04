@@ -20,12 +20,23 @@
         </ListView>
 
         <TextView
+            android:id="@+id/lblTotalQuantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Total Quantity"
+            android:textSize="18sp" />
+
+        <TextView
             android:id="@+id/lblAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:text="Amount" />
+            android:text="Amount"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnCheckout"

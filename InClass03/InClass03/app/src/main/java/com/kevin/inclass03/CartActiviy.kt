@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.preference.PreferenceManager
+import android.view.View
 import android.widget.Toast
 import com.braintreepayments.api.dropin.DropInActivity
 import com.braintreepayments.api.dropin.DropInRequest
@@ -22,7 +23,9 @@ import java.text.DecimalFormat
 class CartActiviy : AppCompatActivity() {
 
     var totalAmount: Double = 0.00
+    var totalQuantity: Int = 0
     val decimalFormat = DecimalFormat("#,###.00")
+    var cart = ArrayList<Item>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,145 +33,67 @@ class CartActiviy : AppCompatActivity() {
 
         val client = OkHttpClient()
 
-        var cart = ArrayList<Item>()
         cart = intent.getParcelableArrayListExtra<Item>("cart")
 
-        val adapter = CartCellAdapter(this, R.layout.cartcell, cart, this)
+        val adapter = CartCellAdapter(this, R.layout.cartcell, cart, this, ShoppingActivity())
         listView.adapter = adapter
 
         for (i in 0 until (cart.size)) {
-            totalAmount += cart.get(i).price
+            val costOfQuantity = cart.get(i).price * cart.get(i).amount
+
+            totalAmount += costOfQuantity
         }
+
+        for (i in 0 until (cart.size)) {
+            val itemQuantity = cart.get(i).amount
+
+            totalQuantity += itemQuantity
+        }
+
+        lblTotalQuantity.text = "Total Quantity: " + totalQuantity
 
 
         val formattedAmount = decimalFormat.format(totalAmount)
         lblAmount.text = "Total Cost: $" + formattedAmount
 
         btnCheckout.setOnClickListener {
-            val reqJson =
-                """
-                {
-                    "token": "${getJwt()}"
-                }
-                """.trimIndent()
-
-            //val url = "http://10.0.2.2:3000/customer"
-            val url = "https://inclass03.herokuapp.com/customer"
-            val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
-            val request = Request.Builder()
-                .url(url)
-                .post(body)
-                .build()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call?, e: IOException?) {
-                    println("${e?.message}")
-                }
-
-                override fun onResponse(call: Call?, response: Response?) {
-                    val body = response?.body()?.string()
-
-                    if (response?.code() == 200) {
-                        val clientToken = JSONObject(body.toString())["clientToken"].toString()
-                        val dropInRequest = DropInRequest()
-                            .clientToken(clientToken)
-                        startActivityForResult(dropInRequest.getIntent(applicationContext), 1)
-                    } else if (response?.code() == 401) {
-                        //This should never happen
-                        Handler(Looper.getMainLooper()).post(Runnable {
-                            Toast.makeText(
-                                applicationContext,
-                                "JWT not validated, unauthorized",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        })
-
-                        toProfilePage()
-                    }
-                }
-            })
-        }
-
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
-                val result =
-                    data!!.getParcelableExtra<DropInResult>(DropInResult.EXTRA_DROP_IN_RESULT)
-                // use the result to update your UI and send the payment method nonce to your server
-
-                val formattedAmount = decimalFormat.format(totalAmount)
-
-                val reqJson =
-                    """
-                    {
-                        "paymentMethodNonce": "${result.paymentMethodNonce?.nonce}",
-                        "paymentMethodAmount": "${formattedAmount}"
-                    }
-                    """.trimIndent()
-
-                val client = OkHttpClient()
-                //val url = "http://10.0.2.2:3000/transaction"
-                val url = "https://inclass03.herokuapp.com/transaction"
-                val body =
-                    RequestBody.create(MediaType.parse("application/json; charset=utf-8"), reqJson)
-                val request = Request.Builder()
-                    .url(url)
-                    .post(body)
-                    .build()
-
-                client.newCall(request).enqueue(object : Callback {
-                    override fun onFailure(call: Call?, e: IOException?) {
-                        println("${e?.message}")
-                    }
-
-                    override fun onResponse(call: Call?, response: Response?) {
-                        val body = response?.body()?.string()
-
-                        if (response?.code() == 200) {
-                            Handler(Looper.getMainLooper()).post(Runnable {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Transaction complete.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            })
-
-                            toProfilePage()
-                        } else if (response?.code() == 400) {
-                            Handler(Looper.getMainLooper()).post(Runnable {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "There was an error while creating transaction",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            })
-
-                            toProfilePage()
-                        }
-                    }
-                })
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                // the user canceled
-                println("canceled")
-            } else {
-                // handle errors here, an exception may be available in
-                val error = data!!.getSerializableExtra(DropInActivity.EXTRA_ERROR) as Exception
-                println(error)
-            }
+            toCardPage()
         }
     }
 
-    fun toProfilePage() {
-        val intent = Intent(this, ProfileActivity::class.java)
+    fun toCardPage() {
+        val intent = Intent(this, CardActivity::class.java)
+
+        val formattedAmount = decimalFormat.format(totalAmount)
+
+        println("cart activity: " + formattedAmount)
+
+        intent.putExtra("chargeAmount", formattedAmount)
         startActivity(intent)
     }
 
-    fun getJwt(): String {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+    fun refreshTotalPrice() {
+        totalAmount = 0.00
 
-        return prefs.getString("jwtToken", null).toString()
+        for (i in 0 until (cart.size)) {
+            val costOfQuantity = cart.get(i).price * cart.get(i).amount
+
+            totalAmount += costOfQuantity
+        }
+
+        val formattedAmount = decimalFormat.format(totalAmount)
+        lblAmount.text = "Total Cost: $" + formattedAmount
+    }
+
+    fun refreshTotalQuantity() {
+        totalQuantity = 0
+
+        for (i in 0 until (cart.size)) {
+            val itemQuantity = cart.get(i).amount
+
+            totalQuantity += itemQuantity
+        }
+
+        lblTotalQuantity.text = "Total Quantity: " + totalQuantity
     }
 }

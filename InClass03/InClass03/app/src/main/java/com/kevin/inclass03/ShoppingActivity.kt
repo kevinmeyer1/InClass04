@@ -11,7 +11,7 @@ import java.io.InputStream
 class ShoppingActivity : AppCompatActivity() {
 
     val itemList = ArrayList<Item>()
-    val cart = ArrayList<Item>()
+    var cart = ArrayList<Item>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +27,8 @@ class ShoppingActivity : AppCompatActivity() {
                 jsonItem.getString("name"),
                 jsonItem.getString("photo"),
                 jsonItem.getDouble("price"),
-                jsonItem.getString("region")
+                jsonItem.getString("region"),
+                1
             )
 
             itemList.add(item)
@@ -58,5 +59,13 @@ class ShoppingActivity : AppCompatActivity() {
 
     fun addToCart(item: Item) {
         this.cart.add(item)
+    }
+
+    fun removeItemFromCart(item: Item) {
+        this.cart.remove(item)
+    }
+
+    fun updateCart(newCart: ArrayList<Item>) {
+        this.cart = newCart
     }
 }
