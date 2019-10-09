@@ -1,4 +1,4 @@
-# InClass03 Android App with API and Database
+# InClass04 Android App with API and Database
 
 This project includes the API and Android app needed to complete the requirements of InClass03.
 
