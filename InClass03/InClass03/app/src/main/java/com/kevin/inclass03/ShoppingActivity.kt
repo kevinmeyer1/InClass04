@@ -20,6 +20,11 @@ class ShoppingActivity : AppCompatActivity() {
         val jsonObj = JSONObject(readJSONFromAsset())["results"]
         val shoppingArr = JSONArray(jsonObj.toString())
 
+        //get cart from cart activity
+        if (intent.getParcelableArrayListExtra<Item>("cart") != null) {
+            this.cart = intent.getParcelableArrayListExtra<Item>("cart")
+        }
+
         for (i in 0 until (shoppingArr.length())) {
             val jsonItem = shoppingArr.getJSONObject(i)
             val item = Item(
@@ -37,10 +42,9 @@ class ShoppingActivity : AppCompatActivity() {
         val adapter = ItemCellAdapter(this, R.layout.itemcell, itemList, this)
         listView.adapter = adapter
 
-
         btnCart.setOnClickListener {
             val intent = Intent(this, CartActiviy::class.java)
-            intent.putParcelableArrayListExtra("cart", cart)
+            intent.putParcelableArrayListExtra("cart", this.cart)
             startActivity(intent)
         }
     }
@@ -63,9 +67,5 @@ class ShoppingActivity : AppCompatActivity() {
 
     fun removeItemFromCart(item: Item) {
         this.cart.remove(item)
-    }
-
-    fun updateCart(newCart: ArrayList<Item>) {
-        this.cart = newCart
     }
 }

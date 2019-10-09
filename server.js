@@ -89,44 +89,7 @@ var findCustomer = function(username, callback) {
 
 app.use(bodyParser.json())
 
-
-/*
-//Get the customer Id
-app.post('/customer', function(req, res) {
-    var token = req.body.token
-
-    jwt.verify(token, jwtSecret, function(err, decodedPayload) {
-        if (err) {
-            console.log('JWT token not verified, user is not authenticated.')
-            res.status(401)
-            res.setHeader('Content-Type', 'text/plain')
-            res.write('JWT verification failed')
-            res.send()
-        } else {
-            var username = decodedPayload['username']
-            findCustomer(username, function(result) {
-                if (result === null) {
-                    console.log(err)
-                    res.status(400)
-                    res.write('Error while getting customer ID from database')
-                    res.send()
-                } else {
-                    if (result.length == 1) {
-                        var customerData = {
-                            id: result[0]['id']
-                        }
-
-                        res.status(200)
-                        res.setHeader('Content-Type', 'application/json')
-                        res.json(customerData)
-                    }
-                }
-            })
-        }
-    })
-})
-*/
-
+//Adds a credit card to a users account. App calls this when checking out, followed by /charge
 app.post('/addCard', function(req, res) {
     var token = req.body.token
     var cardToken = req.body.cardToken
@@ -154,13 +117,10 @@ app.post('/addCard', function(req, res) {
                             res.write('Error while adding card')
                             res.send()
                         } else {
-                            var cardJson = {
-                                'cardToken': card['id']
-                            }
-
                             res.status(200)
-                            res.setHeader('Content-Type', 'application/json')
-                            res.json(cardJson)
+                            res.setHeader('Content-Type', 'text/plain')
+                            res.write(`Card added to users account with id - ${card['id']}`)
+                            res.send()
                         }
                     }
                 )
@@ -169,7 +129,7 @@ app.post('/addCard', function(req, res) {
     })
 })
 
-//Add a credit card for a current user
+//Create a charge for a user, uses the credit card given to the app from /addCard
 app.post('/charge', function(req, res) {
     var token = req.body.token
     var chargeAmount = req.body.chargeAmount
@@ -401,33 +361,38 @@ app.listen(PORT, () => {
     console.log(`Our app is running on port ${ PORT }`);
 })
 
-
-
-
 /*
-app.post('/paymentIntent', function(req, res) {
-    console.log('hello')
-    var amount = req.body.amount
+//Get the customer Id
+app.post('/customer', function(req, res) {
+    var token = req.body.token
 
-    console.log(amount)
-
-    stripe.paymentIntents.create({
-        amount: 1099,
-        currency: 'usd',
-    }, function(err, intent) {
+    jwt.verify(token, jwtSecret, function(err, decodedPayload) {
         if (err) {
-            console.log(err)
-            res.status(400)
+            console.log('JWT token not verified, user is not authenticated.')
+            res.status(401)
+            res.setHeader('Content-Type', 'text/plain')
+            res.write('JWT verification failed')
             res.send()
         } else {
-            var data = {
-                client_secret: intent['client_secret']
-            }
+            var username = decodedPayload['username']
+            findCustomer(username, function(result) {
+                if (result === null) {
+                    console.log(err)
+                    res.status(400)
+                    res.write('Error while getting customer ID from database')
+                    res.send()
+                } else {
+                    if (result.length == 1) {
+                        var customerData = {
+                            id: result[0]['id']
+                        }
 
-            console.log('sending data back')
-            res.status(200)
-            res.setHeader('Content-Type', 'application/json')
-            res.json(data)
+                        res.status(200)
+                        res.setHeader('Content-Type', 'application/json')
+                        res.json(customerData)
+                    }
+                }
+            })
         }
     })
 })

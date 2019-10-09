@@ -61,9 +61,6 @@ class CardActivity : AppCompatActivity() {
             card,
             object : ApiResultCallback<Token> {
                 override fun onSuccess(token: Token) {
-                    println("card has been tokenized")
-                    println(token.id)
-
                     val cardJson =
                         """
                         {

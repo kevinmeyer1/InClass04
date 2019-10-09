@@ -6,23 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".CardActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:text="Add A Card With Stripe"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/card_widget"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.262"
+        tools:layout_editor_absoluteX="0dp" />
+
     <com.stripe.android.view.CardMultilineWidget
         android:id="@+id/card_widget"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.065"
-        tools:layout_editor_absoluteX="39dp" />
+        app:layout_constraintVertical_bias="0.154"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Button
         android:id="@+id/btnAddCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Use Card"
+        android:text="Complete Transaction"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/card_widget" />
+        app:layout_constraintTop_toBottomOf="@+id/card_widget"
+        app:layout_constraintVertical_bias="0.145" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,23 +1,11 @@
 package com.kevin.inclass03
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.preference.PreferenceManager
-import android.view.View
-import android.widget.Toast
-import com.braintreepayments.api.dropin.DropInActivity
-import com.braintreepayments.api.dropin.DropInRequest
-import com.braintreepayments.api.dropin.DropInResult
 import kotlinx.android.synthetic.main.activity_cart_activiy.*
-import kotlinx.android.synthetic.main.activity_shopping.*
 import kotlinx.android.synthetic.main.activity_shopping.listView
 import okhttp3.*
-import org.json.JSONObject
-import java.io.IOException
 import java.text.DecimalFormat
 
 class CartActiviy : AppCompatActivity() {
@@ -33,9 +21,9 @@ class CartActiviy : AppCompatActivity() {
 
         val client = OkHttpClient()
 
-        cart = intent.getParcelableArrayListExtra<Item>("cart")
+        this.cart = intent.getParcelableArrayListExtra<Item>("cart")
 
-        val adapter = CartCellAdapter(this, R.layout.cartcell, cart, this, ShoppingActivity())
+        val adapter = CartCellAdapter(this, R.layout.cartcell, this.cart, this)
         listView.adapter = adapter
 
         for (i in 0 until (cart.size)) {
@@ -59,16 +47,23 @@ class CartActiviy : AppCompatActivity() {
         btnCheckout.setOnClickListener {
             toCardPage()
         }
+
+        btnBackToShopping.setOnClickListener {
+            toShoppingPage()
+        }
     }
 
     fun toCardPage() {
         val intent = Intent(this, CardActivity::class.java)
 
         val formattedAmount = decimalFormat.format(totalAmount)
-
-        println("cart activity: " + formattedAmount)
-
         intent.putExtra("chargeAmount", formattedAmount)
+        startActivity(intent)
+    }
+
+    fun toShoppingPage() {
+        val intent = Intent(this, ShoppingActivity::class.java)
+        intent.putParcelableArrayListExtra("cart", cart)
         startActivity(intent)
     }
 
@@ -95,5 +90,10 @@ class CartActiviy : AppCompatActivity() {
         }
 
         lblTotalQuantity.text = "Total Quantity: " + totalQuantity
+    }
+
+    fun refreshAll() {
+        refreshTotalPrice()
+        refreshTotalQuantity()
     }
 }

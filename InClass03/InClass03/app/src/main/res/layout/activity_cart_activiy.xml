@@ -42,9 +42,16 @@
             android:id="@+id/btnCheckout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
             android:padding="10dp"
-            android:layout_marginBottom="20dp"
             android:text="Checkout" />
+
+        <Button
+            android:id="@+id/btnBackToShopping"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="Back To Shopping" />
 
     </LinearLayout>
 

@@ -24,16 +24,14 @@ public class CartCellAdapter extends ArrayAdapter<Item> {
     int resource;
     ArrayList<Item> itemList;
     CartActiviy cartActiviy;
-    ShoppingActivity shoppingActivity;
 
-    public CartCellAdapter(Context context, int resource, ArrayList<Item> itemList, CartActiviy cartActiviy, ShoppingActivity shoppingActivity) {
+    public CartCellAdapter(Context context, int resource, ArrayList<Item> itemList, CartActiviy cartActiviy) {
         super(context, resource, itemList);
 
         this.context = context;
         this.resource = resource;
         this.itemList = itemList;
         this.cartActiviy = cartActiviy;
-        this.shoppingActivity = shoppingActivity;
     }
 
     @NonNull
@@ -52,9 +50,9 @@ public class CartCellAdapter extends ArrayAdapter<Item> {
         final Item item = itemList.get(position);
 
         name.setText(item.getName());
-        price.setText(Double.toString(item.getPrice()));
-        region.setText(item.getRegion());
-        amount.setText("Quantity: " + Integer.toString(item.getAmount()));
+        price.setText("Price per Item: $" + item.getPrice());
+        region.setText("Region: " + item.getRegion());
+        amount.setText("Quantity: " + item.getAmount());
 
         if (item.getPhoto() != "null") {
             String[] photoParts = item.getPhoto().split("\\.");
@@ -71,13 +69,11 @@ public class CartCellAdapter extends ArrayAdapter<Item> {
         view.findViewById(R.id.btnAddItem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("you clicked add");
                 Integer quantity = item.getAmount();
                 item.setAmount(quantity + 1);
 
                 notifyDataSetChanged();
-                cartActiviy.refreshTotalPrice();
-                cartActiviy.refreshTotalQuantity();
+                cartActiviy.refreshAll();
             }
         });
 
@@ -93,8 +89,7 @@ public class CartCellAdapter extends ArrayAdapter<Item> {
                 }
 
                 notifyDataSetChanged();
-                cartActiviy.refreshTotalPrice();
-                cartActiviy.refreshTotalQuantity();
+                cartActiviy.refreshAll();
             }
         });
 
