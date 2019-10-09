@@ -25,6 +25,8 @@ class CardActivity : AppCompatActivity() {
         val chargeAmountString = intent.getStringExtra("chargeAmount")
         val chargeAmount = chargeAmountString.toDouble()
 
+        println(chargeAmount)
+
         btnAddCard.setOnClickListener {
             var custCard : Card?
             custCard = card_widget.card
@@ -69,8 +71,8 @@ class CardActivity : AppCompatActivity() {
                         }
                         """.trimIndent()
 
-                    val url = "http://10.0.2.2:3000/addCard"
-                    //val url = "https://inclass03.herokuapp.com/customer"
+                    //val url = "http://10.0.2.2:3000/addCard"
+                    val url = "https://inclass04.herokuapp.com/addCard"
                     val cardReqBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), cardJson)
                     val request = Request.Builder()
                         .url(url)
@@ -115,6 +117,8 @@ class CardActivity : AppCompatActivity() {
     fun createCharge(chargeAmount: Double) {
         val client = OkHttpClient()
 
+        println(chargeAmount)
+
         val chargeJson =
             """
             {
@@ -123,8 +127,8 @@ class CardActivity : AppCompatActivity() {
             }
             """.trimIndent()
 
-        val url = "http://10.0.2.2:3000/charge"
-        //val url = "https://inclass03.herokuapp.com/customer"
+        //val url = "http://10.0.2.2:3000/charge"
+        val url = "https://inclass04.herokuapp.com/charge"
         val chargeReqBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), chargeJson)
         val request = Request.Builder()
             .url(url)
