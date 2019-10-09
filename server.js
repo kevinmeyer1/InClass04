@@ -136,6 +136,8 @@ app.post('/charge', function(req, res) {
 
     //Charge amount comes in as a value like 7.89 - needs to be 7890
     chargeAmount = chargeAmount * 100
+    //removing decimals
+    chargeAmount = chargeAmount.toFixed(0)
 
     jwt.verify(token, jwtSecret, function(err, decodedPayload) {
         if (err) {
