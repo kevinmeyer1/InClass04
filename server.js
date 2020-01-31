@@ -1,7 +1,6 @@
 var mysql = require('mysql')
 var bodyParser = require('body-parser')
 var jwt = require('jsonwebtoken')
-var braintree = require("braintree")
 var express = require('express')
 var app = express()
 var config = require('./config.json')
